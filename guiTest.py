@@ -1,6 +1,6 @@
 from PyQt6.QtWidgets import QApplication, QWidget, QVBoxLayout, QPushButton, QLabel
 from PyQt6.QtCore import QTimer
-from listen import startConnection, closeConnection, getTelemetry, the_connection
+from listenTest import startConnection, closeConnection, getTelemetry, the_connection
 import sys
 
 app = QApplication(sys.argv)
