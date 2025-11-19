@@ -15,4 +15,5 @@ print("Heartbeat from system (system %u component %u)" % (the_connection.target_
 
 while True:
     msg = the_connection.recv_match(blocking=True)
+    
     print(msg)
