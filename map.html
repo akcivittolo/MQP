@@ -17,7 +17,7 @@
             <meta name="viewport" content="width=device-width,
                 initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
             <style>
-                #map_2189593c74023599380f107440a3ca74 {
+                #map_b16442897fbd6a9524d20ecd1426cdb0 {
                     position: relative;
                     width: 100.0%;
                     height: 100.0%;
@@ -54,16 +54,16 @@
 <body>
     
     
-            <div class="folium-map" id="map_2189593c74023599380f107440a3ca74" ></div>
+            <div class="folium-map" id="map_b16442897fbd6a9524d20ecd1426cdb0" ></div>
         
 </body>
 <script>
     
     
-            var map_2189593c74023599380f107440a3ca74 = L.map(
-                "map_2189593c74023599380f107440a3ca74",
+            var map_b16442897fbd6a9524d20ecd1426cdb0 = L.map(
+                "map_b16442897fbd6a9524d20ecd1426cdb0",
                 {
-                    center: [-35.3632622, 149.1652376],
+                    center: [42.293377, -71.816133],
                     crs: L.CRS.EPSG3857,
                     ...{
   "zoom": 17,
@@ -78,14 +78,14 @@
 
         
     
-            var tile_layer_26510687a97c372da061e3bf61f2a34a = L.tileLayer(
-                "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+            var tile_layer_4ca5a2adcc0396a983829773e638bc05 = L.tileLayer(
+                "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
                 {
   "minZoom": 0,
-  "maxZoom": 19,
-  "maxNativeZoom": 19,
+  "maxZoom": 18,
+  "maxNativeZoom": 18,
   "noWrap": false,
-  "attribution": "\u0026copy; \u003ca href=\"https://www.openstreetmap.org/copyright\"\u003eOpenStreetMap\u003c/a\u003e contributors",
+  "attribution": "Tiles \u0026copy; Esri \u0026mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community",
   "subdomains": "abc",
   "detectRetina": false,
   "tms": false,
@@ -95,24 +95,7 @@
             );
         
     
-            tile_layer_26510687a97c372da061e3bf61f2a34a.addTo(map_2189593c74023599380f107440a3ca74);
-        
-    
-            var marker_f92d701c60c4c8e2430a24ecdf759a77 = L.marker(
-                [-35.3632622, 149.1652376],
-                {
-}
-            ).addTo(map_2189593c74023599380f107440a3ca74);
-        
-    
-            marker_f92d701c60c4c8e2430a24ecdf759a77.bindTooltip(
-                `<div>
-                     ASV
-                 </div>`,
-                {
-  "sticky": true,
-}
-            );
+            tile_layer_4ca5a2adcc0396a983829773e638bc05.addTo(map_b16442897fbd6a9524d20ecd1426cdb0);
         
 </script>
 </html>
