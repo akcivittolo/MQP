@@ -1,4 +1,4 @@
-# updated 1:29 pm 12/8 with connection to SITL via CHAT
+# updated 2:21 pm 12/8 with copypasted get_base_current and function defns
 # Control Loop with MAVLink Communication for ASV
 from pymavlink import mavutil
 import time
@@ -186,7 +186,61 @@ def interrupt_check():
         if msg.command == 30000:  # Custom GoTo command
             return msg.param1
     return None
+# Polling functions for sensor data
+def gps_status():
+    """Check if GPS has 3D fix"""
+    msg = master.recv_match(type='GPS_RAW_INT', blocking=False)
+    if not msg:
+        return False
+    return msg.fix_type >= 3   # fix_type 3 = 3D Fix
 
+def get_battery_pct():
+    """Get battery percentage (0-100%)"""
+    msg = master.recv_match(type="BATTERY_STATUS", blocking=False)
+    if msg:
+        return msg.battery_remaining
+    
+    msg = master.recv_match(type="SYS_STATUS", blocking=False)
+    if msg:
+        return msg.battery_remaining
+    
+    return 100  # Default
+
+def get_base_current():
+    """Get current draw in amps"""
+    msg = master.recv_match(type="SYS_STATUS", blocking=False)
+    if msg:
+        return msg.current_battery / 100.0  # Convert cA to A
+    return 8.0  # Placeholder for testing
+
+def accel_is_extreme():
+    """Check for collision-level accelerations"""
+    msg = master.recv_match(type="HIGHRES_IMU", blocking=False)
+    if not msg:
+        return False
+    ax, ay, az = msg.xacc, msg.yacc, msg.zacc
+    # Check for sudden acceleration (m/sÂ²)
+    return abs(ax) > 20 or abs(ay) > 20 or abs(az) > 30
+
+def imu_orientation():
+    """Get pitch and roll from IMU"""
+    msg = master.recv_match(type="ATTITUDE", blocking=False)
+    if not msg:
+        return (0.0, 0.0)
+    return (msg.pitch, msg.roll)
+
+def sonar_ok():
+    """Check sonar sensor"""
+    # Replace with actual sonar check
+    return True
+
+def current_sensor_ok():
+    """Check current sensor"""
+    # Replace with actual current sensor check
+    return True
+
+# Add a placeholder for speed since it's used in LOITER state
+speed = 0.0  # Current speed placeholder
 # ----------------------------
 # MAIN CONTROL LOOP with MAVLink
 # ----------------------------

@@ -25,6 +25,22 @@ def close_connection(the_connection):
         the_connection.close()
         print("Connection closed")
 
+def get_arm_status(the_connection):
+    msg = the_connection.recv_match(type='HEARTBEAT', blocking=False)
+
+    if msg == None:
+        return None
+    
+    print(msg.base_mode)
+    print(mavutil.mavlink.MAV_MODE_FLAG_SAFETY_ARMED)
+
+    if (msg.base_mode & mavutil.mavlink.MAV_MODE_FLAG_SAFETY_ARMED):
+        print("The boat is armed")
+        return 1
+    else:
+        print("The boat is unarmed")
+        return 0
+
 # Send an arm command
 def arm_command(the_connection):
 
@@ -33,49 +49,32 @@ def arm_command(the_connection):
             return None
         
         the_connection.mav.command_long_send(
-            master_connection.target_system,
-            master_connection.target_component,
+            the_connection.target_system,
+            the_connection.target_component,
             mavutil.mavlink.MAV_CMD_COMPONENT_ARM_DISARM,
             0, # Message confirmation
             1, # 0 disarm, 1 arm
+            1, # 0 allow safety checks to prevent arm/disarm, 1 force the arm/disarm
+            0,0,0,0,0
+        )
+           
+
+# Send a disarm command
+def disarm_command(the_connection):
+
+        if the_connection ==None:
+            print("There is no connection available")
+            return None
+        
+        the_connection.mav.command_long_send(
+            the_connection.target_system,
+            the_connection.target_component,
+            mavutil.mavlink.MAV_CMD_COMPONENT_ARM_DISARM,
+            0, # Message confirmation
+            0, # 0 disarm, 1 arm
             0, # 0 allow safety checks to prevent arm/disarm, 1 force the arm/disarm
             0,0,0,0,0
         )
-
-        msg = master_connection.recv_match(type='COMMAND_ACK', blocking=True)
-        if msg.result == 0:
-            print("Boat armed")
-            arm_status = True
-        else:
-            print("Arm failed")
-            arm_status = False
-
-# Send a disarm command
-def disarm_command(self):
-        global master_connection
-        global arm_status
-
-        if master_connection!=None:
-            master_connection.mav.command_long_send(
-                master_connection.target_system,
-                master_connection.target_component,
-                mavutil.mavlink.MAV_CMD_COMPONENT_ARM_DISARM,
-                0, # Message confirmation
-                0, # 0 disarm, 1 arm
-                0, # 0 allow safety checks to prevent arm/disarm, 1 force the arm/disarm
-                0,0,0,0,0
-            )
-
-            msg = master_connection.recv_match(type='COMMAND_ACK', blocking=True)
-            if msg.result == 0:
-                print("Boat disarmed")
-                arm_status = False
-            else:
-                print("Disarm failed")
-                arm_status = False
-        else:
-            print("No connection available")
-            return None
         
 def setCircleMode(self):
         global master_connection

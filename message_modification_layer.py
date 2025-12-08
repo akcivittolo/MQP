@@ -19,8 +19,7 @@ desired_message_types = ['SYS_STATUS',
                          'GPS_RAW_INT',
                          'GLOBAL_POSITION_INT',
                          'ATTITUDE',
-                         'BATTERY_STATUS',
-                         'HEARTBEAT'
+                         'BATTERY_STATUS'
                         ]
 
 # There are various sources that define messages and enums for mavlink

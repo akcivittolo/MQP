@@ -27,7 +27,11 @@ import folium
 from folium import plugins
 
 from mavlink_layer import (start_connection,
-                           close_connection)
+                           close_connection,
+                           arm_command,
+                           disarm_command,
+                           get_arm_status
+                          )
 
 from message_modification_layer import (prepare_message_dictionary, 
                          set_messages,
@@ -50,8 +54,6 @@ telemetry_data_row_list = []
 
 priorLat = 42.293377
 priorLon = -71.816133
-
-arm_status = False
 
 class telemetry_data_row():
     def __init__(self, name, value, alert):
@@ -141,8 +143,8 @@ class MainWindow(QMainWindow):
         missionPanelTitle.setMinimumHeight(20)
         missionPanelTitle.setMaximumHeight(20)
 
-        self.arm_status = QLabel("DISARMED", alignment = Qt.AlignmentFlag.AlignCenter)
-        self.arm_status.setStyleSheet("background-color: green;")
+        self.arm_status_label = QLabel("DISARMED", alignment = Qt.AlignmentFlag.AlignCenter)
+        self.arm_status_label.setStyleSheet("background-color: green;")
 
         arm_button = QPushButton("ARM")
         disarm_button = QPushButton("DISARM")
@@ -162,7 +164,7 @@ class MainWindow(QMainWindow):
 
         missionPanel.addWidget(missionPanelTitle)
         missionPanel.addLayout(mode_choice_layout)
-        missionPanel.addWidget(self.arm_status)
+        missionPanel.addWidget(self.arm_status_label)
         missionPanel.addWidget(arm_button)
         missionPanel.addWidget(disarm_button)
         missionPanel.addWidget(self.connection_status)
@@ -171,10 +173,8 @@ class MainWindow(QMainWindow):
 
         # circle_mode_button.clicked.connect(self.setCircleMode)
 
-        # arm_button.clicked.connect(self.arm_command)
-        # arm_button.clicked.connect(self.arm_status_label_handler)
-        # disarm_button.clicked.connect(self.disarm_command)
-        # disarm_button.clicked.connect(self.arm_status_label_handler)
+        arm_button.clicked.connect(self.arm_boat_handler)
+        disarm_button.clicked.connect(self.disarm_boat_handler)
 
         connect_button.clicked.connect(self.start_connection_handler)
         disconnect_button.clicked.connect(self.close_connection_handler)
@@ -195,6 +195,8 @@ class MainWindow(QMainWindow):
         set_messages(self.the_connection)
     
     def close_connection_handler(self):
+        self.disarm_boat_handler()
+
         close_connection(self.the_connection)
         self.the_connection = None
         self.connection_status_label_handler()
@@ -296,7 +298,6 @@ class MainWindow(QMainWindow):
             pass
     
     def reset_telemetry_data(self):
-        global arm_status
 
         # Iterate through all the widgets in our telemetry panel
         for panel_index in range(self.telemetryPanel_data.count()):
@@ -308,25 +309,45 @@ class MainWindow(QMainWindow):
                 data_row.itemAt(2).widget().setText("Empty")
                 data_row.itemAt(2).widget().setStyleSheet("background-color: red;")
 
-        arm_status = False
-        self.arm_status_label_handler()
+    def arm_boat_handler(self):
+        if self.the_connection == None:
+            print("No connection. Unable to arm")
+            return None
 
-    def arm_status_label_handler(self):
-        global arm_status
+        arm_command(self.the_connection)
 
-        print("We are in the label handler")
-        print(arm_status)
+        arm_flag = 0
 
-        if arm_status == True:
-            self.arm_status.setText("ARMED")
-            self.arm_status.setStyleSheet("background-color: red;")
+        while arm_flag != 1:
+            arm_flag = get_arm_status(self.the_connection)
+            print(arm_flag)
+            self.arm_status_label_handler(arm_flag)
         
-        if arm_status == False:
-            self.arm_status.setText("DISARMED")
-            self.arm_status.setStyleSheet("background-color: green;")
-
-
+    def disarm_boat_handler(self):
+        if self.the_connection == None:
+            print("No connection. Unable to disarm")
+            return None
         
+        disarm_command(self.the_connection)
+
+        arm_flag = 1
+
+        while arm_flag != 0:
+            arm_flag = get_arm_status(self.the_connection)
+            print(arm_flag)
+            self.arm_status_label_handler(arm_flag)
+
+    def arm_status_label_handler(self, arm_status_flag):
+
+        if arm_status_flag == 1:
+            self.arm_status_label.setText("ARMED")
+            self.arm_status_label.setStyleSheet("background-color: red;")
+            return 1
+        
+        if arm_status_flag == 0:
+            self.arm_status_label.setText("DISARMED")
+            self.arm_status_label.setStyleSheet("background-color: green;")
+            return 0        
 
 app = QApplication(sys.argv)
 window = MainWindow()
