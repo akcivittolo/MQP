@@ -26,7 +26,10 @@ from PyQt6.QtWebEngineWidgets import QWebEngineView
 import folium
 from folium import plugins
 
-from dataDesired import (prepare_message_dictionary, 
+from mavlink_layer import (start_connection,
+                           close_connection)
+
+from message_modification_layer import (prepare_message_dictionary, 
                          set_messages,
                          get_desired_messages,
                          get_msg_fields,
@@ -50,41 +53,6 @@ priorLon = -71.816133
 
 arm_status = False
 
-def startConnection():
-    global master_connection
-
-    if master_connection != None:
-        print("Connection already exists")
-        return master_connection
-    else:  
-        mav_connection = mavutil.mavlink_connection("tcp:172.21.103.161:5760")
-        mav_connection.wait_heartbeat()
-
-    if mav_connection is None:
-        print("Connection failed")
-        return None
-    else:
-        print("Connection successful")
-        return mav_connection
-
-def start_connection_handler():
-    global master_connection
-    master_connection = startConnection()
-    set_messages(master_connection)
-    return master_connection
-
-def closeConnection(mav_connection):
-    if mav_connection is None:
-        print("No Connection")
-    else:
-        mav_connection.close()
-        print("Connection closed")
-
-def close_connection_handler():
-    global master_connection
-    closeConnection(master_connection)
-    master_connection = None
-
 class telemetry_data_row():
     def __init__(self, name, value, alert):
         self.name = name
@@ -95,6 +63,9 @@ class MainWindow(QMainWindow):
 
     def __init__(self):
         super().__init__()
+
+        # Define a variable to store the mavlink connection
+        self.the_connection = None
     
         # Set window title, icon, and size
         self.setWindowTitle("WPilot")
@@ -146,7 +117,7 @@ class MainWindow(QMainWindow):
 
         self.telemetryPanel.addWidget(scroll)
 
-        self.initializeTelemetryData()
+        self.initialize_telemetry_data()
 
         # Customize mapPanel
         mapPanelTitle = QLabel("Map", alignment = Qt.AlignmentFlag.AlignCenter)
@@ -183,7 +154,6 @@ class MainWindow(QMainWindow):
         mode_choice_layout.addWidget(choose_mode_label)
         mode_choice_layout.addWidget(circle_mode_button)
 
-
         self.connection_status = QLabel("No Connection", alignment = Qt.AlignmentFlag.AlignCenter)
         self.connection_status.setStyleSheet("background-color: red;")
 
@@ -199,22 +169,19 @@ class MainWindow(QMainWindow):
         missionPanel.addWidget(connect_button)
         missionPanel.addWidget(disconnect_button)
 
-        circle_mode_button.clicked.connect(self.setCircleMode)
+        # circle_mode_button.clicked.connect(self.setCircleMode)
 
-        arm_button.clicked.connect(self.arm_command)
-        arm_button.clicked.connect(self.arm_status_label_handler)
-        disarm_button.clicked.connect(self.disarm_command)
-        disarm_button.clicked.connect(self.arm_status_label_handler)
+        # arm_button.clicked.connect(self.arm_command)
+        # arm_button.clicked.connect(self.arm_status_label_handler)
+        # disarm_button.clicked.connect(self.disarm_command)
+        # disarm_button.clicked.connect(self.arm_status_label_handler)
 
-        connect_button.clicked.connect(start_connection_handler)
-        connect_button.clicked.connect(self.connection_status_label_handler)
-        disconnect_button.clicked.connect(close_connection_handler)
-        disconnect_button.clicked.connect(self.connection_status_label_handler)
-        disconnect_button.clicked.connect(self.resetTelemetryData)
+        connect_button.clicked.connect(self.start_connection_handler)
+        disconnect_button.clicked.connect(self.close_connection_handler)
 
         # Create a timer for updating telemetry
         self.timer = QTimer()
-        self.timer.timeout.connect(self.updateTelemetryData)
+        self.timer.timeout.connect(self.update_telemetry_data)
         self.timer.start(200)
 
         # Create a slower timer for updating map
@@ -222,42 +189,24 @@ class MainWindow(QMainWindow):
         self.slowTimer.timeout.connect(self.updateMapMarker)
         self.slowTimer.start(1000)
 
-    def setCircleMode(self):
-        global master_connection
-
-        if master_connection is None:
-            print("No connection available")
-            return
-
-        # Make sure the boat is armed
-        if not arm_status:
-            print("Boat must be armed first!")
-            return
-
-         # Ensure GUIDED mode
-        guided_mode = master_connection.mode_mapping()['GUIDED']
-        master_connection.set_mode(guided_mode)
-
-        lat = 100
-        lon = 100
-        alt = 0
-
-        # Send the command
-        master_connection.mav.set_position_target_global_int_send(
-            10,  # time_boot_ms (ignored)
-            master_connection.target_system,
-            master_connection.target_component,
-            mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT_INT,
-            int(0b110111111000),  # type_mask: only position
-            int(lat * 1e7),       # latitude in degE7
-            int(lon * 1e7),       # longitude in degE7
-            alt,                  # altitude
-            0, 0, 0,              # velocity (ignored)
-            0, 0, 0,              # acceleration (ignored)
-            0, 0                  # yaw, yaw_rate
-        )
-
-        print(f"Heading to point ({lat},{lon},{alt})")
+    def start_connection_handler(self):
+        self.the_connection = start_connection(self.the_connection)
+        self.connection_status_label_handler()
+        set_messages(self.the_connection)
+    
+    def close_connection_handler(self):
+        close_connection(self.the_connection)
+        self.the_connection = None
+        self.connection_status_label_handler()
+        self.reset_telemetry_data()
+        
+    def connection_status_label_handler(self):
+        if self.the_connection != None:
+            self.connection_status.setText("Connected")
+            self.connection_status.setStyleSheet("background-color: green;")
+        else:
+            self.connection_status.setText("No Connection")
+            self.connection_status.setStyleSheet("background-color: red;")
 
     def updateMapMarker(self):
         global priorLat
@@ -289,7 +238,7 @@ class MainWindow(QMainWindow):
             except:
                 pass
 
-    def initializeTelemetryData(self):
+    def initialize_telemetry_data(self):
         ordered_messages = prepare_message_dictionary()
 
         targeted_fields = []
@@ -318,9 +267,9 @@ class MainWindow(QMainWindow):
 
         print (telemetry_data_row_list)
     
-    def updateTelemetryData(self):
+    def update_telemetry_data(self):
 
-        current_msg = get_desired_messages(master_connection)
+        current_msg = get_desired_messages(self.the_connection)
         
         # Create lists for the current message's fields and values
         if current_msg != None:
@@ -346,7 +295,7 @@ class MainWindow(QMainWindow):
         else:
             pass
     
-    def resetTelemetryData(self):
+    def reset_telemetry_data(self):
         global arm_status
 
         # Iterate through all the widgets in our telemetry panel
@@ -362,17 +311,6 @@ class MainWindow(QMainWindow):
         arm_status = False
         self.arm_status_label_handler()
 
-
-
-    def connection_status_label_handler(self):
-        global master_connection
-        if master_connection != None:
-            self.connection_status.setText("Connected")
-            self.connection_status.setStyleSheet("background-color: green;")
-        else:
-            self.connection_status.setText("No Connection")
-            self.connection_status.setStyleSheet("background-color: red;")
-
     def arm_status_label_handler(self):
         global arm_status
 
@@ -386,58 +324,6 @@ class MainWindow(QMainWindow):
         if arm_status == False:
             self.arm_status.setText("DISARMED")
             self.arm_status.setStyleSheet("background-color: green;")
-
-    def arm_command(self):
-        global master_connection
-        global arm_status
-
-        if master_connection!=None:
-            master_connection.mav.command_long_send(
-                master_connection.target_system,
-                master_connection.target_component,
-                mavutil.mavlink.MAV_CMD_COMPONENT_ARM_DISARM,
-                0, # Message confirmation
-                1, # 0 disarm, 1 arm
-                0, # 0 allow safety checks to prevent arm/disarm, 1 force the arm/disarm
-                0,0,0,0,0
-            )
-
-            msg = master_connection.recv_match(type='COMMAND_ACK', blocking=True)
-            if msg.result == 0:
-                print("Boat armed")
-                arm_status = True
-            else:
-                print("Arm failed")
-                arm_status = False
-        else:
-            print("No connection available")
-            return None
-    
-    def disarm_command(self):
-        global master_connection
-        global arm_status
-
-        if master_connection!=None:
-            master_connection.mav.command_long_send(
-                master_connection.target_system,
-                master_connection.target_component,
-                mavutil.mavlink.MAV_CMD_COMPONENT_ARM_DISARM,
-                0, # Message confirmation
-                0, # 0 disarm, 1 arm
-                0, # 0 allow safety checks to prevent arm/disarm, 1 force the arm/disarm
-                0,0,0,0,0
-            )
-
-            msg = master_connection.recv_match(type='COMMAND_ACK', blocking=True)
-            if msg.result == 0:
-                print("Boat disarmed")
-                arm_status = False
-            else:
-                print("Disarm failed")
-                arm_status = False
-        else:
-            print("No connection available")
-            return None
 
 
         

@@ -16,26 +16,24 @@ from connectionFunctions import *
 
 # Define what message types we actually want
 desired_message_types = ['SYS_STATUS',
-                        'GPS_RAW_INT',
-                        'GLOBAL_POSITION_INT',
-                        'ATTITUDE',
-                        'BATTERY_STATUS'
+                         'GPS_RAW_INT',
+                         'GLOBAL_POSITION_INT',
+                         'ATTITUDE',
+                         'BATTERY_STATUS',
+                         'HEARTBEAT'
                         ]
 
-def prepare_message_dictionary ():
+# There are various sources that define messages and enums for mavlink
+message_paths = ['message_definitions/v1.0/common.xml',
+                 'message_definitions/v1.0/minimal.xml'
+                ]
 
-    # There are various sources that define messages and enums for mavlink
-    common_message_path = 'message_definitions/v1.0/common.xml'
-    ardupilotmega_message_path = 'message_definitions/v1.0/ardupilotmega.xml'
-
-    # We choose what source we want to reference for our messages and enums
-    chosen_message_path = common_message_path
-
+def read_and_parse_file(message_path):
     # We want to access the .xml that contains our definitions
-    chosen_file = resources.files(pymavlink).joinpath(chosen_message_path)
+    common_file = resources.files(pymavlink).joinpath(message_path)
 
     # Open and read the .xml file we've chosen
-    with chosen_file.open("r") as file:
+    with common_file.open("r") as file:
         read_xml = file.read()
         print("We read the file")
 
@@ -43,13 +41,28 @@ def prepare_message_dictionary ():
     # the XML document
     mavlink_dictionary = xmltodict.parse(read_xml)
 
+    return mavlink_dictionary
+
+def ensure_list_of_dicts(item):
+    if isinstance(item, list):
+        return item
+    else:
+        return [item]
+
+def prepare_message_dictionary():
+
+    mavlink_common_dictionary = read_and_parse_file(message_paths[0])
+    mavlink_minimal_dictionary = read_and_parse_file(message_paths[1])
+
     # Create a list of available message types
-    messages_available = mavlink_dictionary['mavlink']['messages']['message']
+    common_messages_available = mavlink_common_dictionary['mavlink']['messages']['message']
+    minimal_messages_available = mavlink_minimal_dictionary['mavlink']['messages']['message']
+    combined_messages_available = ensure_list_of_dicts(common_messages_available) + ensure_list_of_dicts(minimal_messages_available)
 
     ordered_messages = []
 
     for msg_type in desired_message_types:
-        for msg in messages_available:
+        for msg in combined_messages_available:
             if msg.get('@name') == msg_type:
                 fields = msg.get('field', [])
                 if isinstance(fields, dict):
