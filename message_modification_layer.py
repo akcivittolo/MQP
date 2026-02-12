@@ -19,7 +19,10 @@ desired_message_types = ['SYS_STATUS',
                          'GPS_RAW_INT',
                          'GLOBAL_POSITION_INT',
                          'ATTITUDE',
-                         'BATTERY_STATUS'
+                         'BATTERY_STATUS',
+                         'HEARTBEAT',
+                         'VFR_HUD',
+                         'MISSION_CURRENT'
                         ]
 
 # There are various sources that define messages and enums for mavlink
@@ -99,7 +102,11 @@ def set_messages(master_connection, ordered_messages = prepare_message_dictionar
 def get_desired_messages(master_connection):
     while True:
         if master_connection != None:
-            msg = master_connection.recv_match(blocking=True)
+            msg = master_connection.recv_match(blocking=False)
+
+            if msg == None:
+                break
+
             msg_type = msg.get_type()
             for type in desired_message_types:
                 if type == msg_type:
