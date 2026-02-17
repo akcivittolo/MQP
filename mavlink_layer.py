@@ -20,8 +20,13 @@ def start_connection(current_connection):
     if current_connection != None:
         print("Connection already exists")
         return current_connection
- 
-    the_connection = mavutil.mavlink_connection("tcp:172.21.103.161:5760")
+    
+    # Simulation Connection
+    # the_connection = mavutil.mavlink_connection("tcp:172.21.103.161:5760")
+
+    # USB Connection
+    the_connection = mavutil.mavlink_connection("COM8", baud=57600)
+
     the_connection.wait_heartbeat()
     
     if the_connection is None:

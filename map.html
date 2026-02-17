@@ -17,7 +17,7 @@
             <meta name="viewport" content="width=device-width,
                 initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
             <style>
-                #map_bf17aa369b9aa47c2f8f11c6a6cb1c7e {
+                #map_fc2e4b658b7522af9fc72e3766b3894d {
                     position: relative;
                     width: 100.0%;
                     height: 100.0%;
@@ -56,7 +56,7 @@
     
             <script>
                 setTimeout(function() {
-                    window.map = map_bf17aa369b9aa47c2f8f11c6a6cb1c7e;
+                    window.map = map_fc2e4b658b7522af9fc72e3766b3894d;
                 }, 0);
             </script>
             
@@ -70,14 +70,14 @@
             </script>
             
     
-            <div class="folium-map" id="map_bf17aa369b9aa47c2f8f11c6a6cb1c7e" ></div>
+            <div class="folium-map" id="map_fc2e4b658b7522af9fc72e3766b3894d" ></div>
         
 </body>
 <script>
     
     
-            var map_bf17aa369b9aa47c2f8f11c6a6cb1c7e = L.map(
-                "map_bf17aa369b9aa47c2f8f11c6a6cb1c7e",
+            var map_fc2e4b658b7522af9fc72e3766b3894d = L.map(
+                "map_fc2e4b658b7522af9fc72e3766b3894d",
                 {
                     center: [42.293377, -71.816133],
                     crs: L.CRS.EPSG3857,
@@ -94,7 +94,7 @@
 
         
     
-            var tile_layer_fad1363ce2b36114ef23df40da1406ca = L.tileLayer(
+            var tile_layer_d8419b989912041696fd0f137bfccc24 = L.tileLayer(
                 "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
                 {
   "minZoom": 0,
@@ -111,18 +111,18 @@
             );
         
     
-            tile_layer_fad1363ce2b36114ef23df40da1406ca.addTo(map_bf17aa369b9aa47c2f8f11c6a6cb1c7e);
+            tile_layer_d8419b989912041696fd0f137bfccc24.addTo(map_fc2e4b658b7522af9fc72e3766b3894d);
         
     
-                var lat_lng_popup_1c9d0a65ee866679eb4a832b16a4b18b = L.popup();
+                var lat_lng_popup_cab4ee9372daca87285733b3519ad3a0 = L.popup();
                 function latLngPop(e) {
-                    lat_lng_popup_1c9d0a65ee866679eb4a832b16a4b18b
+                    lat_lng_popup_cab4ee9372daca87285733b3519ad3a0
                         .setLatLng(e.latlng)
                         .setContent("Latitude: " + e.latlng.lat.toFixed(4) +
                                     "<br>Longitude: " + e.latlng.lng.toFixed(4))
-                        .openOn(map_bf17aa369b9aa47c2f8f11c6a6cb1c7e);
+                        .openOn(map_fc2e4b658b7522af9fc72e3766b3894d);
                     }
-                map_bf17aa369b9aa47c2f8f11c6a6cb1c7e.on('click', latLngPop);
+                map_fc2e4b658b7522af9fc72e3766b3894d.on('click', latLngPop);
             
 </script>
 </html>
