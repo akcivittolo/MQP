@@ -2,7 +2,7 @@ from pymavlink import mavutil
 
 def startConnection(device):  
     mav_connection = mavutil.mavlink_connection(f'{device}')
-    mav_connection.wait_heartbeat()
+    mav_connection.wait_heartbeat(timeout=5)
 
     if mav_connection is None:
         print("Connection failed")

@@ -4,7 +4,6 @@ import pymavlink
 from pymavlink import mavutil
 
 from connectionFunctions import *
-
 # Enter the following code into WSL to start the simulation:
 # sim_vehicle.py -v Rover -f motorboat-skid -A "--serial0=tcp:0.0.0.0:5760" --no-mavproxy
 
@@ -26,14 +25,19 @@ desired_message_types = ['SYS_STATUS',
                         ]
 
 # There are various sources that define messages and enums for mavlink
-message_paths = ['message_definitions/v1.0/common.xml',
-                 'message_definitions/v1.0/minimal.xml'
+# message_paths = ['message_definitions/v1.0/common.xml',
+#                 'message_definitions/v1.0/minimal.xml'
+#                ]
+
+message_paths = ['dialects/v10/common.xml',
+                 'dialects/v10/minimal.xml'
                 ]
+
 
 def read_and_parse_file(message_path):
     # We want to access the .xml that contains our definitions
     common_file = resources.files(pymavlink).joinpath(message_path)
-
+    
     # Open and read the .xml file we've chosen
     with common_file.open("r") as file:
         read_xml = file.read()

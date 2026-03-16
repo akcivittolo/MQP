@@ -25,9 +25,11 @@ def start_connection(current_connection):
     # the_connection = mavutil.mavlink_connection("tcp:172.21.103.161:5760")
 
     # USB Connection
-    the_connection = mavutil.mavlink_connection("COM8", baud=57600)
+    # the_connection = mavutil.mavlink_connection("COM8", baud=57600)
 
-    the_connection.wait_heartbeat()
+    the_connection = mavutil.mavlink_connection("udp:127.0.0.1:14550")
+
+    the_connection.wait_heartbeat(timeout = 5)
     
     if the_connection is None:
         print("Connection failed")
@@ -46,7 +48,11 @@ def close_connection(the_connection):
 
 # Get the current arm status of the boat
 def get_arm_status(the_connection):
-    msg = the_connection.recv_match(type='HEARTBEAT', blocking=False)
+
+    if the_connection != None:
+        msg = the_connection.recv_match(type='HEARTBEAT', blocking=True)
+    else:
+        msg = None
 
     if msg == None:
         return None
@@ -97,21 +103,20 @@ def disarm_command(the_connection):
     )
 
 rover_custom_modes = [
-    "Manual",
-    "Acro",
-    "Learning",
-    "Steering",
-    "Hold",
-    "Loiter",
-    "Follow",
-    "Simple",
-    "Dock",
-    "Circle",
-    "Auto",
-    "RTL",
-    "SmartRTL",
-    "Guided",
-    "Initializing"
+        "Manual",
+        "Acro",
+        "NA",
+        "Steering",
+        "Hold",
+        "Loiter",
+        "Follow",
+        "Simple",
+        "Dock",
+        "Circle",
+        "Auto",
+        "RTL",
+        "SmartRTL",
+        "Guided"
 ]
 # Get the current mode of the boat
 def get_current_mode(the_connection):
@@ -119,14 +124,15 @@ def get_current_mode(the_connection):
         print("There is no connection available. Cannot get current mode")
         return None
     
-    msg = the_connection.recv_match(type='HEARTBEAT', blocking=False)
+    msg = the_connection.recv_match(type='HEARTBEAT', blocking=True)
 
     if msg == None:
-        return None
+        pass
+    else:
     
-    current_mode = rover_custom_modes[msg.custom_mode]
+        current_mode = rover_custom_modes[msg.custom_mode]
 
-    return current_mode
+        return current_mode
 
 # Change the mode to circle mode
 def change_mode(the_connection, chosen_mode):

@@ -50,8 +50,8 @@ from message_modification_layer import (prepare_message_dictionary,
 ) 
 
 # You have to have this for the taskbar icon (Thank you Stack Overflow)
-myappid = 'mycompany.myproduct.subproduct.version' # arbitrary string
-ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
+# myappid = 'mycompany.myproduct.subproduct.version' # arbitrary string
+# ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
 
 # Enter the following code into WSL to start the simulation:
 # sim_vehicle.py -L indianLake -v Rover -f motorboat-skid -A "--serial0=tcp:0.0.0.0:5760" --no-mavproxy
@@ -71,6 +71,8 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
 
+        self.prior_mode = None
+
         # Define a variable to store the mavlink connection
         self.the_connection = None
     
@@ -81,7 +83,7 @@ class MainWindow(QMainWindow):
         # Set the Windows taskbar icon
         path_to_icon = 'ChatGPTBoatTaskbar.png'
         pixmap = QPixmap()
-        pixmap.loadFromData( Path(path_to_icon).read_bytes())
+        pixmap.loadFromData(Path(path_to_icon).read_bytes())
         appIcon = QIcon(pixmap)
         self.setWindowIcon(appIcon)
 
@@ -290,8 +292,9 @@ class MainWindow(QMainWindow):
 
         # Create a timer for updating telemetry
         self.timer = QTimer()
+        self.timer.setInterval(100)
         self.timer.timeout.connect(self.update_telemetry_data)
-        self.timer.start(20)
+        self.timer.start()
 
     def set_mission_handler(self):
         if self.the_connection == None:
@@ -418,7 +421,20 @@ class MainWindow(QMainWindow):
     
     def update_telemetry_data(self):
 
+       
+
         current_msg = get_desired_messages(self.the_connection)
+
+        current_mode = get_current_mode(self.the_connection)
+
+        if current_mode!= self.prior_mode:
+            self.current_mode_label.setText(current_mode)
+            self.prior_mode = current_mode
+
+        arm_flag = get_arm_status(self.the_connection)
+        print(arm_flag)
+        self.arm_status_label_handler(arm_flag)
+    
         
         # Create lists for the current message's fields and values
         if current_msg == None:
@@ -426,6 +442,7 @@ class MainWindow(QMainWindow):
 
         # Update our current mode label
         if current_msg.get_type() == 'HEARTBEAT':
+            print(current_msg.custom_mode)
             self.current_mode_label.setText(rover_custom_modes[current_msg.custom_mode])
 
         # Update our map data
