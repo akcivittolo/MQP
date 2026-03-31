@@ -1,8 +1,0 @@
-WPIPilot - Custom GCS Software for Autonomous Boats
-
-Files:
-
-SITL.zip - Contains the files needed to run the SITL simulation.
-guiTest.py - This is code meant for the GUI. Utilizes PyQt6. Very simple window is created
-listenTest.py - Receives MavLink data. Currently set to listen from the simulation.
-telemetryDemo.py - Made to show to the prof. that we can actually get data from the simulation.
