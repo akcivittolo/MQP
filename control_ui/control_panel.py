@@ -11,11 +11,12 @@ from PyQt6.QtWidgets import (
 
 from PyQt6.QtCore import Qt
 
-from mode_select_subpanel import ModeSelectSubpanel
-from connection_subpanel import ConnectionSubpanel
-from arming_subpanel import ArmingSubpanel
-from rc_overide_subpanel import RCOverideSubpanel
-from mission_planning_subpanel import MissionPlanningSubpanel
+# from mode_select_subpanel import ModeSelectSubpanel
+# from connection_subpanel import ConnectionSubpanel
+# from arming_subpanel import ArmingSubpanel
+from control_ui.rc_overide_subpanel import RCOverideSubpanel
+from control_ui.mission_planning_subpanel import MissionPlanningSubpanel
+
 
 class ControlPanel(QFrame):
     def __init__(self, the_boat, telem_data, mission_data):
@@ -30,6 +31,7 @@ class ControlPanel(QFrame):
         # self.connection_subpanel = ConnectionSubpanel(self.the_boat)
         self.mission_planning_subpanel = MissionPlanningSubpanel(self.mission_data, self.the_boat, self.telem_data)
         self.rc_overide_subpanel = RCOverideSubpanel(self.the_boat)
+      
 
 
 

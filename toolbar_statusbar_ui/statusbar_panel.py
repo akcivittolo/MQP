@@ -14,12 +14,12 @@ from PyQt6.QtWidgets import (
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QIcon, QPixmap, QAction, QPainter, QColor
 
-from mode_select_subpanel import ModeSelectSubpanel
-from connection_subpanel import ConnectionSubpanel
-from arming_subpanel import ArmingSubpanel
-from rc_overide_subpanel import RCOverideSubpanel
+# from mode_select_subpanel import ModeSelectSubpanel
+# from connection_subpanel import ConnectionSubpanel
+# from arming_subpanel import ArmingSubpanel
+from control_ui.rc_overide_subpanel import RCOverideSubpanel
 
-from statuslight import StatusLight
+from toolbar_statusbar_ui.statuslight import StatusLight
 
 class StatusbarPanel(QStatusBar):
     def __init__(self, the_boat, telem_data):

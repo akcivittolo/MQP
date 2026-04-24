@@ -39,12 +39,12 @@ class MapSubpanel(QWidget):
         self.add_dependencies()
 
         # Connect javascript for live updates
-        with open("map_update.js") as f:
+        with open("map_ui/map_update.js") as f:
             js_code = f.read()  
         self.map.get_root().html.add_child(folium.Element(f"<script>{js_code}</script>"))
 
         # Create the map as an HTML file
-        self.map.save("map.html")
+        self.map.save("map_ui/map.html")
         self.map_view = QWebEngineView()
         self.map_view.setHtml(self.map.get_root().render())
 
@@ -76,7 +76,7 @@ class MapSubpanel(QWidget):
     def add_dependencies(self):
 
         # Allows the marker image to get accessed
-        with open("marker.png", "rb") as f:
+        with open("assets/marker.png", "rb") as f:
             encoded = base64.b64encode(f.read()).decode()
 
         self.map.get_root().html.add_child(

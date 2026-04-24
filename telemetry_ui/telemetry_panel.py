@@ -6,10 +6,10 @@ from PyQt6.QtWidgets import (
     QGroupBox
 )
 
-from gps_data_subpanel import GPSSubpanel
-from battery_subpanel import BatterySubpanel
-from supervisor_subpanel import SupervisorSubpanel
-from servo_output_subpanel import ServoOutputSubpanel
+from telemetry_ui.gps_data_subpanel import GPSSubpanel
+from telemetry_ui.battery_subpanel import BatterySubpanel
+from telemetry_ui.supervisor_subpanel import SupervisorSubpanel
+from telemetry_ui.servo_output_subpanel import ServoOutputSubpanel
 
 
 class TelemetryPanel(QFrame):

@@ -8,7 +8,7 @@ from PyQt6.QtWidgets import (
 
 from PyQt6.QtCore import Qt
 
-from statuslight import StatusLight
+from toolbar_statusbar_ui.statuslight import StatusLight
 
 class BatterySubpanel(QGroupBox):
     def __init__(self, the_boat, telem_data):

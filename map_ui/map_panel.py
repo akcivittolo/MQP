@@ -5,9 +5,9 @@ from PyQt6.QtWidgets import (
     QFrame
 )
 
-from map_subpanel import MapSubpanel
+from map_ui.map_subpanel import MapSubpanel
 # from mission_planning_subpanel import MissionPlanningSubpanel
-from waypoint_display_subpanel import WaypointDisplaySubpanel
+from map_ui.waypoint_display_subpanel import WaypointDisplaySubpanel
        
 class MapPanel(QFrame):
     def __init__(self, telem_data, mission_data):

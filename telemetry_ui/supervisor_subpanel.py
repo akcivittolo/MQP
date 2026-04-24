@@ -66,6 +66,8 @@ class SupervisorSubpanel(QGroupBox):
         sup_message_text = self.telem_data.telemetry_data["STATUSTEXT"]["text"]
         sup_message_sev = self.telem_data.telemetry_data["STATUSTEXT"]["severity"]
 
+        print(f"Updating ui with {sup_message_text}")
+
         if sup_message_text != None:
 
             # self.sup_message.setText(str(sup_message_text))

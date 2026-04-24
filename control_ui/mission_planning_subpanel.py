@@ -14,7 +14,7 @@ from PyQt6.QtWidgets import (
     QSizePolicy
 )
 
-from statuslight import StatusLight
+from toolbar_statusbar_ui.statuslight import StatusLight
 
 from PyQt6.QtCore import Qt
 

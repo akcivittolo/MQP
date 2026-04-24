@@ -1,7 +1,7 @@
 from pymavlink import mavutil
 from PyQt6.QtCore import QObject, pyqtSignal, QTimer
 
-class Connection(QObject):
+class ConnectionData(QObject):
     # Connection status signal
     connection_status_signal = pyqtSignal(bool)
     arm_status_signal = pyqtSignal(bool)

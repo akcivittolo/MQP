@@ -16,10 +16,10 @@ from PyQt6.QtWidgets import (
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QIcon, QPixmap, QAction
 
-from mode_select_subpanel import ModeSelectSubpanel
-from connection_subpanel import ConnectionSubpanel
-from arming_subpanel import ArmingSubpanel
-from rc_overide_subpanel import RCOverideSubpanel
+# from mode_select_subpanel import ModeSelectSubpanel
+# from connection_subpanel import ConnectionSubpanel
+# from arming_subpanel import ArmingSubpanel
+from control_ui.rc_overide_subpanel import RCOverideSubpanel
 
 class ToolbarPanel(QToolBar):
     def __init__(self, the_boat, telem_data):

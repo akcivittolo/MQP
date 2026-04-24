@@ -14,45 +14,45 @@ from PyQt6.QtWidgets import (
     QToolBar,
 )
 
-from toolbar_panel import ToolbarPanel
-from statusbar_panel import StatusbarPanel
-from telemetry_panel import TelemetryPanel
-from map_panel import MapPanel
-from control_panel import ControlPanel
+from toolbar_statusbar_ui.toolbar_panel import ToolbarPanel
+from toolbar_statusbar_ui.statusbar_panel import StatusbarPanel
+from telemetry_ui.telemetry_panel import TelemetryPanel
+from map_ui.map_panel import MapPanel
+from control_ui.control_panel import ControlPanel
 
-from connection_logic import Connection
-from telemetry_logic import TelemetryData
-from mission_planning_logic import MissionData
+from core_logic.connection_logic import ConnectionData
+from core_logic.telemetry_logic import TelemetryData
+from core_logic.mission_planning_logic import MissionData
 
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
 
         # Instantiate necessary classes
-        self.the_boat = Connection()
-        self.telem_data = TelemetryData(self.the_boat)
-        self.mission_data = MissionData(self.the_boat)
+        self.connection_data = ConnectionData()
+        self.telem_data = TelemetryData(self.connection_data)
+        self.mission_data = MissionData(self.connection_data)
 
         # Toolbar
-        self.toolbar_panel = ToolbarPanel(self.the_boat, self.telem_data)
+        self.toolbar_panel = ToolbarPanel(self.connection_data, self.telem_data)
         self.addToolBar(self.toolbar_panel)
 
         # Statusbar
-        self.statusbar_panel = StatusbarPanel(self.the_boat, self.telem_data)
+        self.statusbar_panel = StatusbarPanel(self.connection_data, self.telem_data)
         self.setStatusBar(self.statusbar_panel)
 
         # Title and icon
         self.setWindowTitle("Boat Pilot")
-        self.setWindowIcon(QIcon("boatIcon.png"))
+        self.setWindowIcon(QIcon("assets/boatIcon.png"))
 
         # Central widget
         central_widget = QWidget()
         self.setCentralWidget(central_widget)
 
         # Instantiate panels
-        self.telemetry_panel = TelemetryPanel(self.the_boat, self.telem_data)
+        self.telemetry_panel = TelemetryPanel(self.connection_data, self.telem_data)
         self.map_panel = MapPanel(self.telem_data, self.mission_data)
-        self.control_panel = ControlPanel(self.the_boat, self.telem_data, self.mission_data)
+        self.control_panel = ControlPanel(self.connection_data, self.telem_data, self.mission_data)
 
         # Create the layout
         overall_H_layout = QHBoxLayout()
@@ -79,9 +79,9 @@ class MainWindow(QMainWindow):
         # toolbar.addAction(connect_action)
         
 
-app = QApplication(sys.argv)
+# app = QApplication(sys.argv)
 
 
-window = MainWindow()
-window.show()
-app.exec()
+# window = MainWindow()
+# window.show()
+# app.exec()
