@@ -31,7 +31,7 @@ class MapSubpanel(QWidget):
         indianLakeCords = [42.293377, -71.816133]
         self.map = folium.Map(
             location = indianLakeCords,
-            tiles = "Cartodb Positron",
+            tiles = "OpenStreetMap",
             zoom_start = 17
         )
 
